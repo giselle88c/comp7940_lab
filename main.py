@@ -1,4 +1,4 @@
-#MAIN
+#MASTER
 
 def main():
     print("hello world")
