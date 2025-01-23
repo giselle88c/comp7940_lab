@@ -1,3 +1,5 @@
+# MAIN
+
 def main():
     print("hello world")
 
