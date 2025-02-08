@@ -1,6 +1,7 @@
 #MASTER
 
 # user 1
+# user 2
 
 def main():
     print("hello world")
