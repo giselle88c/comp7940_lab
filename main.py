@@ -1,7 +1,7 @@
 #MASTER
 
-# user 1
-# user 2
+# user 1 
+# user 2 - 3
 
 # user 1 - commit 2,3
 def main():
