@@ -15,7 +15,7 @@ def Ex1(factor):
             if x%i==0:
                 print(i,end=" ")
     print()
-
+#user 2 commit2
 
 if __name__ == '__main__':
     main()
