@@ -1,4 +1,5 @@
 """Basic connection example.
+redis
 """
 
 import redis
