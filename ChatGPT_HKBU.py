@@ -1,6 +1,7 @@
 import configparser
 import requests
 
+#ChatGPT
 class HKBU_ChatGPT():
     def __init__(self,config_='./config.ini'):
         if type(config_) == str:
