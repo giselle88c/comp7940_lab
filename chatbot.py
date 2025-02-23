@@ -18,9 +18,6 @@ def main():
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
     
 
-    # register a dispatcher to handle message: here we register an echo dispatcher
-    # echo_handler = MessageHandler(Filters.text & (~Filters.command), echo)
-    # dispatcher.add_handler(echo_handler)
     # dispatcher for chatgpt
     global chatgpt
     chatgpt = HKBU_ChatGPT(config)
@@ -36,6 +33,10 @@ def main():
     # on different commands - answer in Telegram
     dispatcher.add_handler(CommandHandler("add", add))
     dispatcher.add_handler(CommandHandler("help", help_command))
+    dispatcher.add_handler(CommandHandler("hello", hello))
+
+    dispatcher.add_handler(CommandHandler("user", add_user))
+    dispatcher.add_handler(CommandHandler("logout", del_user))
 
     # To start the bot:
     updater.start_polling()
@@ -52,6 +53,47 @@ def echo(update, context):
 
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
+
+
+def add_user(update: Update, context: CallbackContext) -> None:
+
+    try:
+
+        global redis1
+        logging.info(context.args[0])
+        msg = context.args[0] 
+
+        # /add keyword <-- this should store the keyword
+        if(redis1.exists('user')==0):
+            redis1.set('user',msg)
+            update.message.reply_text('Hello, '+msg+'! Nice to meet you!')
+        else:
+            msg=redis1.get('user')
+            update.message.reply_text('You have already logged in as '+msg+'~')
+
+
+    except:
+        if(redis1.exists('user')==1):
+            msg=redis1.get('user')
+            update.message.reply_text('You have already logged in as '+msg+'~')
+        else: 
+            update.message.reply_text('Usage: /add <keyword>')
+
+
+def del_user(update: Update, context: CallbackContext) -> None:
+
+    global redis1
+
+    if(redis1.exists('user')==1):
+
+        msg=redis1.get('user')
+        redis1.delete('user')
+        update.message.reply_text('Goodbye, '+msg+'.')
+    else:
+        update.message.reply_text('You have not log in yet.')
+
+
+
 def help_command(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /help is issued."""
     update.message.reply_text('Helping you helping you.')
@@ -62,11 +104,23 @@ def add(update: Update, context: CallbackContext) -> None:
     try:
         global redis1
         logging.info(context.args[0])
-        msg = context.args[0] # /add keyword <-- this should store the keyword
+        msg = context.args[0] 
+        # /add keyword <-- this should store the keyword
         redis1.incr(msg)
         update.message.reply_text('You have said ' + msg + ' for ' + redis1.get(msg) + ' times.')
     except (IndexError, ValueError):
         update.message.reply_text('Usage: /add <keyword>')
+
+def hello(update: Update, context: CallbackContext) -> None:
+    """Send a message when the command /hello is issued."""
+    try:
+        global redis1
+        logging.info(context.args[0])
+        msg = context.args[0] 
+
+        update.message.reply_text('Good day, ' + msg + '!')
+    except (IndexError, ValueError):
+        update.message.reply_text('Usage: /hello <keyword>')
 
 
 from ChatGPT_HKBU import HKBU_ChatGPT
