@@ -5,6 +5,7 @@
 
 app = 'comp7940-lab-old-butterfly-1083'
 primary_region = 'hkg'
+console_command = '/code/manage.py shell'
 
 [build]
   builder = 'paketobuildpacks/builder:base'
