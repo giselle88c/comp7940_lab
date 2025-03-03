@@ -10,8 +10,17 @@ class HKBU_ChatGPT():
         elif type(config_) == configparser.ConfigParser:
             self.config = config_
 
+
+
     def submit(self,message):
-        conversation = [{"role": "user", "content": message}]
+        
+        my_agent = {
+        "role": "system",
+        "content": "you are lovely hamster pet by Giselle, a bit jealous of anson lo, speak in cantonese"
+        }
+
+        conversation = [my_agent,{"role": "user", "content": message}]
+        
         url = (self.config['CHATGPT']['BASICURL']) + "/deployments/" + (self.config['CHATGPT']['MODELNAME']) + "/chat/completions/?api-version=" + (self.config['CHATGPT']['APIVERSION'])
         headers = { 'Content-Type': 'application/json', 'api-key': (self.config['CHATGPT']['ACCESS_TOKEN']) }
         payload = { 'messages': conversation }
@@ -25,6 +34,8 @@ class HKBU_ChatGPT():
 
 if __name__ == '__main__':
     ChatGPT_test = HKBU_ChatGPT()
+
+    
     while True:
         user_input = input("Typing anything to ChatGPT:\t")
         response = ChatGPT_test.submit(user_input)

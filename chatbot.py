@@ -5,6 +5,7 @@ import logging
 import redis
 global redis1
 
+
 def main():
 # Load your token and create an Updater for your Bot
     config = configparser.ConfigParser()
@@ -20,6 +21,8 @@ def main():
 
     # dispatcher for chatgpt
     global chatgpt
+
+
     chatgpt = HKBU_ChatGPT(config)
     chatgpt_handler = MessageHandler(Filters.text & (~Filters.command),
     equiped_chatgpt)
@@ -127,10 +130,14 @@ from ChatGPT_HKBU import HKBU_ChatGPT
 
 def equiped_chatgpt(update, context):
     global chatgpt
+
     reply_message = chatgpt.submit(update.message.text)
+        
     logging.info("Update: " + str(update))
     logging.info("context: " + str(context))
     context.bot.send_message(chat_id=update.effective_chat.id, text=reply_message)
+
+    chatgpt_check=False
 
 if __name__ == '__main__':
     main()
