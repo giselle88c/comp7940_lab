@@ -1,13 +1,18 @@
 # Install and import OpenAI Python library
 #!pip install openai --upgrade
 from openai import AzureOpenAI
-import openai
+#import openai
+import configparser
 
 # Parameters
+config = configparser.ConfigParser()
+config.read('config.ini')
+
+
 client = AzureOpenAI(
   azure_endpoint = "https://hkust.azure-api.net",
   api_version = "2024-06-01",
-  api_key = "7c475fca9bb744e7ad3a44d797c2c186" #put your api key here
+  api_key = config['UST_CHATGPT']['ACCESS_TOKEN'] #put your api key here
 )
 
 # Function
