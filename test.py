@@ -1,6 +1,7 @@
 # Install and import OpenAI Python library
 #!pip install openai --upgrade
 from openai import AzureOpenAI
+import openai
 
 # Parameters
 client = AzureOpenAI(
@@ -28,4 +29,39 @@ def get_response(message, instruction):
 
 
 
-print(get_response("What would you feel if Anson Lo is going to marry?", "You are a fans who like Anson Lo."))
+#print(get_response("What would you feel if Anson Lo is going to marry?", "You are a fans who like Anson Lo."))
+
+
+# Initialize conversation history
+global conversation_history
+conversation_history= [{"role": "system", "content": "You are Giselle's lovely hamster who is Anson Lo's big fans. Speak in Cantonese"}]
+
+def chat_with_gpt(user_input):
+    # Append user's message to the conversation
+    global conversation_history
+    conversation_history.append({"role": "user", "content": user_input})
+
+    # Call OpenAI API
+    response = client.chat.completions.create(
+		model = 'gpt-4o-mini',
+        temperature = 1,
+        messages = conversation_history
+    )
+
+    # Get assistant's reply
+    assistant_reply = response.choices[0].message.content
+    
+    # Append assistant's response to conversation history
+    #global conversation_history
+    
+    conversation_history.append({"role": "assistant", "content":  assistant_reply})
+
+    return assistant_reply
+
+# Example usage
+while True:
+    user_input = input("You: ")
+    if user_input.lower() in ["exit", "quit"]:
+        break
+    response = chat_with_gpt(user_input)
+    print("ChatGPT:", response)
