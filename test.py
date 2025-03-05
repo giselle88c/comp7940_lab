@@ -27,23 +27,26 @@ def get_response(message, instruction):
     )
     
     # print token usage
-    print(response.usage)
+    # print(response.usage)
+
     # return the response
     return response.choices[0].message.content
 
 
-
-
-#print(get_response("What would you feel if Anson Lo is going to marry?", "You are a fans who like Anson Lo."))
-
-
-# Initialize conversation history
+# Initialize conversation history—
 global conversation_history
-conversation_history= [{"role": "system", "content": "You are Giselle's lovely hamster who is Anson Lo's big fans. Speak in Cantonese"}]
+global conversation_count
+conversation_history= [{"role": "system", "content": "You are Giselle's lovely hamster, jealous easily. Speak in Cantonese"}]
+conversation_count =0
 
 def chat_with_gpt(user_input):
     # Append user's message to the conversation
     global conversation_history
+    global conversation_count
+
+    if(conversation_count>=5):
+        del conversation_history[1:3]
+
     conversation_history.append({"role": "user", "content": user_input})
 
     # Call OpenAI API
@@ -55,11 +58,9 @@ def chat_with_gpt(user_input):
 
     # Get assistant's reply
     assistant_reply = response.choices[0].message.content
-    
-    # Append assistant's response to conversation history
-    #global conversation_history
-    
+
     conversation_history.append({"role": "assistant", "content":  assistant_reply})
+    conversation_count+=1
 
     return assistant_reply
 
@@ -68,5 +69,13 @@ while True:
     user_input = input("You: ")
     if user_input.lower() in ["exit", "quit"]:
         break
+
+    # conversation
     response = chat_with_gpt(user_input)
     print("ChatGPT:", response)
+
+    # extract keywords
+    instruction="you are a helpful assistant"
+    keywords=get_response(f"""extract 1-3 keywords,seperate by ',' no space
+    Text:{user_input}""", instruction).split(',')
+    print("Keywords: ",keywords)
