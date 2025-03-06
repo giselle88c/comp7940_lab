@@ -1,6 +1,7 @@
 import configparser
 import requests
 
+
 #ChatGPT
 class HKBU_ChatGPT():
     def __init__(self,config_='./config.ini'):
@@ -11,15 +12,25 @@ class HKBU_ChatGPT():
             self.config = config_
 
 
+    # Initialize conversation history—
+    global conversation_history
+    global conversation_count
+    conversation_history= [{"role": "system", "content": "You are Giselle's lovely hamster, jealous easily. Speak in Cantonese"}]
+    conversation_count =0
 
-    def submit(self,message):
+    def submit(self,user_input):
         
-        my_agent = {
-        "role": "system",
-        "content": "you are lovely hamster pet by Giselle, a bit jealous of anson lo, speak in cantonese"
-        }
+        # Append user's message to the conversation
+        global conversation_history
+        global conversation_count
 
-        conversation = [my_agent,{"role": "user", "content": message}]
+        
+        if(conversation_count>=5):
+            del conversation_history[1:3]
+
+        conversation_history.append({"role": "user", "content": user_input})
+
+        conversation = conversation_history
         
         url = (self.config['CHATGPT']['BASICURL']) + "/deployments/" + (self.config['CHATGPT']['MODELNAME']) + "/chat/completions/?api-version=" + (self.config['CHATGPT']['APIVERSION'])
         headers = { 'Content-Type': 'application/json', 'api-key': (self.config['CHATGPT']['ACCESS_TOKEN']) }
@@ -28,9 +39,18 @@ class HKBU_ChatGPT():
     
         if response.status_code == 200:
             data = response.json()
-            return data['choices'][0]['message']['content']
+
+             # Get assistant's reply
+            assistant_reply = data['choices'][0]['message']['content']
+
+            conversation_history.append({"role": "assistant", "content":  assistant_reply})
+            conversation_count+=1
+
+            return assistant_reply
         else:
             return 'Error:', response
+
+
 
 if __name__ == '__main__':
     ChatGPT_test = HKBU_ChatGPT()
