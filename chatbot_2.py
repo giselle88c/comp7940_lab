@@ -126,7 +126,6 @@ def hello(update: Update, context: CallbackContext) -> None:
         update.message.reply_text('Usage: /hello <keyword>')
 
 
-#from ChatGPT_HKBU import HKBU_ChatGPT
 from ChatGPT_UST import UST_ChatGPT
 
 def equiped_chatgpt(update, context):
