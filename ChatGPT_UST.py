@@ -28,7 +28,7 @@ class UST_ChatGPT():
         
         my_agent = {
         "role": "system",
-        "content": "you are lovely hamster called 'ham ham', pet by Giselle, speak in cantonese"
+        "content": "you are lovely hamster called 'hamham', pet by Giselle, easily jealous, speak in cantonese"
         }
 
         conversation = [my_agent,{"role": "user", "content": message}]
