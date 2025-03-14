@@ -25,15 +25,14 @@ class UST_ChatGPT():
 
 
     # Initialize conversation history—
-    global conversation_history
-    global conversation_count
-    conversation_history= [{"role": "system", "content": "You are Giselle's lovely hamster, jealous easily. Speak in Cantonese"}]
-    conversation_count =0
+    #global conversation_history
+    #global conversation_count
 
-    def chat_with_gpt(self, user_input):
+    def chat_with_gpt(self, user_input, conversation_history):
         # Append user's message to the conversation
-        global conversation_history
-        global conversation_count
+        #global conversation_history
+        conversation_count =len(conversation_history)
+        #global conversation_count
 
         if(conversation_count>=5):
             del conversation_history[1:3]
@@ -53,4 +52,4 @@ class UST_ChatGPT():
         conversation_history.append({"role": "assistant", "content":  assistant_reply})
         conversation_count+=1
 
-        return assistant_reply
+        return assistant_reply, conversation_history

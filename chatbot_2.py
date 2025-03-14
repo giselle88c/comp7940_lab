@@ -4,8 +4,15 @@ import configparser
 import os
 import logging
 import redis
+import json
 global redis1
+global conv_list
+global conv_list_default
+conv_list_default= [{"role": "system", "content": "You are Giselle's lovely hamster, jealous easily. Speak in Cantonese"}]
 
+conv_list= [{"role": "system", "content": "You are Giselle's lovely hamster, jealous easily. Speak in Cantonese"}]
+global user
+user='guest'
 
 def main():
 # Load your token and create an Updater for your Bot
@@ -68,35 +75,48 @@ def add_user(update: Update, context: CallbackContext) -> None:
         global redis1
         logging.info(context.args[0])
         msg = context.args[0] 
+        global conv_list
+        global conv_list_default
+        global user
+        conv=''
 
         # /add keyword <-- this should store the keyword
-        if(redis1.exists('user')==0):
-            redis1.set('user',msg)
-            update.message.reply_text('Hello, '+msg+'! Nice to meet you!')
+        if(redis1.exists('user_'+msg)==0):
+            user=msg
+            redis1.set('user_'+user, user)
+            update.message.reply_text('Hello, '+user+'! Nice to meet you!')
         else:
-            msg=redis1.get('user')
-            update.message.reply_text('You have already logged in as '+msg+'~')
+            user=msg
+            # load conversation history if any
+            if(redis1.exists(user+'_conv')==1):
+                conv=redis1.get(user+'_conv')
+                try:
+                    conv_list=json.loads(conv)
+                except: 
+                    conv_list=conv_list_default
+                    logging.info('error in conv_list decode')
 
+            update.message.reply_text('You have logged in as '+user+'~')
 
     except:
-        if(redis1.exists('user')==1):
-            msg=redis1.get('user')
-            update.message.reply_text('You have already logged in as '+msg+'~')
-        else: 
             update.message.reply_text('Usage: /add <keyword>')
 
 
 def del_user(update: Update, context: CallbackContext) -> None:
 
     global redis1
+    global user
+    msg = context.args[0] 
+    if(redis1.exists('user_'+msg)==1):
+        redis1.delete('user_'+msg)
 
-    if(redis1.exists('user')==1):
-
-        msg=redis1.get('user')
-        redis1.delete('user')
+        if(redis1.exists('conv_'+msg)==1):
+            redis1.delete('conv_'+msg)
         update.message.reply_text('Goodbye, '+msg+'.')
     else:
         update.message.reply_text('You have not log in yet.')
+
+    user='guset'
 
 
 
@@ -133,10 +153,30 @@ from ChatGPT_UST import UST_ChatGPT
 
 def equiped_chatgpt(update, context):
     global chatgpt
-
+    global conv_list
+    global redis1
+    global user
     #reply_message = chatgpt.submit(update.message.text)
-    reply_message = chatgpt.chat_with_gpt(update.message.text)
     
+    if(redis1.exists(user+'_conv')==1):
+        try: 
+            conv_list=json.loads(redis1.get(user+'_conv'))
+        except: 
+            conv_list=conv_list_default
+            logging.info('error in conv_list decode')
+        logging.info("convlist from db:" + str(conv_list))
+    
+    reply_message, conv_list = chatgpt.chat_with_gpt(update.message.text, conv_list)
+
+
+    if(redis1.exists(user+'_conv')==1):
+        try:
+            redis1.set(user+'_conv',json.dumps(conv_list))
+            logging.info("Update conv_list"+str(json.dumps(conv_list)))
+        except: pass
+    else: 
+        conv_list= conv_list_default
+
     logging.info("Update: " + str(update))
     logging.info("context: " + str(context))
     context.bot.send_message(chat_id=update.effective_chat.id, text=reply_message)
