@@ -1,6 +1,6 @@
 import configparser
 import requests
-
+import os
 
 #ChatGPT
 class HKBU_ChatGPT():
@@ -31,9 +31,14 @@ class HKBU_ChatGPT():
         conversation_history.append({"role": "user", "content": user_input})
 
         conversation = conversation_history
+        base_url='https://genai.hkbu.edu.hk/general/rest'
+        model_name='gpt-4-o-mini'
+        app_version='2024-05-01-preview'
+        url = (base_url) + "/deployments/" + (model_name) + "/chat/completions/?api-version=" + (app_version)
+        headers = { 'Content-Type': 'application/json', 'api-key': (os.environ['CHATGPT']) }
         
-        url = (self.config['CHATGPT']['BASICURL']) + "/deployments/" + (self.config['CHATGPT']['MODELNAME']) + "/chat/completions/?api-version=" + (self.config['CHATGPT']['APIVERSION'])
-        headers = { 'Content-Type': 'application/json', 'api-key': (self.config['CHATGPT']['ACCESS_TOKEN']) }
+        #url = (self.config['CHATGPT']['BASICURL']) + "/deployments/" + (self.config['CHATGPT']['MODELNAME']) + "/chat/completions/?api-version=" + (self.config['CHATGPT']['APIVERSION'])
+        #headers = { 'Content-Type': 'application/json', 'api-key': (self.config['CHATGPT']['ACCESS_TOKEN']) }
         payload = { 'messages': conversation }
         response = requests.post(url, json=payload, headers=headers)
     

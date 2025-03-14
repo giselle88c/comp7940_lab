@@ -3,14 +3,14 @@ import requests
 from openai import AzureOpenAI
 
 # Parameters
-config = configparser.ConfigParser()
-config.read('config.ini')
-
+#config = configparser.ConfigParser()
+#config.read('config.ini')
+import os
 
 client = AzureOpenAI(
   azure_endpoint = "https://hkust.azure-api.net",
   api_version = "2024-06-01",
-  api_key = config['UST_CHATGPT']['ACCESS_TOKEN'] #put your api key here
+  api_key = os.environ['UST_CHATGPT'] #put your api key here
 )
 
 #ChatGPT
@@ -21,29 +21,6 @@ class UST_ChatGPT():
             self.config.read(config_)
         elif type(config_) == configparser.ConfigParser:
             self.config = config_
-
-
-
-    def submit(self,message):
-        
-        my_agent = {
-        "role": "system",
-        "content": "you are lovely hamster called 'hamham', pet by Giselle, easily jealous, speak in cantonese"
-        }
-
-        conversation = [my_agent,{"role": "user", "content": message}]
-        
-        url = (self.config['UST_CHATGPT']['BASICURL']) + "/deployments/" + (self.config['UST_CHATGPT']['MODELNAME']) + "/chat/completions/?api-version=" + (self.config['UST_CHATGPT']['APIVERSION'])
-        headers = { 'Content-Type': 'application/json', 'api-key': (self.config['UST_CHATGPT']['ACCESS_TOKEN']) }
-        payload = { 'messages': conversation }
-        response = requests.post(url, json=payload, headers=headers)
-    
-        if response.status_code == 200:
-            data = response.json()
-            return data['choices'][0]['message']['content']
-        else:
-            return 'Error:', response
-
 
 
 
@@ -77,12 +54,3 @@ class UST_ChatGPT():
         conversation_count+=1
 
         return assistant_reply
-
-
-if __name__ == '__main__':
-        ChatGPT_test = UST_ChatGPT()
-
-        while True:
-            user_input = input("Typing anything to ChatGPT:\t")
-            response = ChatGPT_test.submit(user_input)
-            print(response)
