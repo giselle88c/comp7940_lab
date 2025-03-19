@@ -4,12 +4,15 @@ import configparser
 import logging
 import redis
 global redis1
+import os
 
 def main():
 # Load your token and create an Updater for your Bot
     config = configparser.ConfigParser()
     config.read('config.ini')
-    updater = Updater(token=(config['TELEGRAM']['ACCESS_TOKEN']), use_context=True)
+    
+    updater = Updater(token=(os.getenv('TELEGRAM')), use_context=True)
+    #updater = Updater(token=(config['TELEGRAM']['ACCESS_TOKEN']), use_context=True)
     dispatcher = updater.dispatcher
     global redis1
     redis1 = redis.Redis(host=(config['REDIS']['HOST']), password=(config['REDIS']['PASSWORD']), port=(config['REDIS']['REDISPORT']), decode_responses=(config['REDIS']['DECODE_RESPONSE']), username=(config['REDIS']['USER_NAME']))
